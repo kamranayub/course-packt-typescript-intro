@@ -8,6 +8,7 @@
     },
 
     "include": [
-        "WhatsNewInTypeScript/**/*.ts"
+        "S2_V1_BasicFeatures/**/*.ts",
+        "S2_V2_AdvancedFeatures/**/*.ts"
     ]
 }
