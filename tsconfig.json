@@ -1,0 +1,13 @@
+{
+    "compileOnSave": true,
+
+    "compilerOptions": {
+        "watch": true,
+        "target": "es6",
+        "pretty": true
+    },
+
+    "include": [
+        "WhatsNewInTypeScript/**/*.ts"
+    ]
+}
