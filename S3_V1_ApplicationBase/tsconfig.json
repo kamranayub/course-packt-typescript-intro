@@ -2,6 +2,7 @@
     "compileOnSave": true,
     "compilerOptions": {
         "target": "es6",
-        "watch": true
+        "watch": true,
+        "module": "commonjs"
     }
 }
