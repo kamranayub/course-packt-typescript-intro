@@ -11,8 +11,9 @@ function minimistAs(args, opts) {
 }
 function fromArgv(argv) {
     var parsedArgs = minimistAs(argv, {
-        alias: { 'encoder': ['e'] },
-        default: { 'encoder': encoders_1.DEFAULT_ENCODER }
+        boolean: 'decode',
+        alias: { 'encoding': 'e', 'decode': 'd' },
+        default: { 'encoding': encoders_1.DEFAULT_ENCODER }
     });
     return new Options_1.Options(parsedArgs._.join(' '), parsedArgs);
 }

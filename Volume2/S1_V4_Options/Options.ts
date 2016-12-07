@@ -5,19 +5,22 @@ import { encoders } from './encoders';
  * Parsed properties from process args
  */
 export interface ProcessArgs {
-    encoder: string;
+    readonly encoding: string;
+    readonly decode: boolean;
 } 
 
-export class Options {
+export class Options implements ProcessArgs {
     readonly encoder: IEncoder;
-    readonly encoderType: string;
+    readonly encoding: string;
+    readonly decode: boolean;
 
     constructor(public readonly input: string, args: ProcessArgs) {
-        if (typeof args.encoder === 'undefined') {
+        if (typeof args.encoding === 'undefined') {
             throw new Error(`Please pass a valid encoder option: ${Object.keys(encoders).join(', ')}`);
         }
 
-        this.encoderType = args.encoder;
-        this.encoder = encoders[this.encoderType];        
+        this.decode = args.decode;
+        this.encoding = args.encoding;
+        this.encoder = encoders[this.encoding];
     }
 }

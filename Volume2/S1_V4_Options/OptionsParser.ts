@@ -12,9 +12,10 @@ function minimistAs<T>(args?: string[], opts?: minimist.Opts): T & minimist.Pars
 }
 
 export function fromArgv(argv: string[]): Options {
-    var parsedArgs = minimistAs<ProcessArgs>(argv, { 
-        alias:   { 'encoder': ['e'] },
-        default: { 'encoder': DEFAULT_ENCODER }
+    var parsedArgs = minimistAs<ProcessArgs>(argv, {
+        boolean: 'decode',
+        alias:   { 'encoding': 'e', 'decode': 'd' },
+        default: { 'encoding': DEFAULT_ENCODER }
     });
 
     return new Options(parsedArgs._.join(' '), parsedArgs);
