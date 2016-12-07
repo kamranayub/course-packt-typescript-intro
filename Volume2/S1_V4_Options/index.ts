@@ -1,4 +1,3 @@
-import { Options } from './Options';
 import * as OptionsParser from './OptionsParser';
 
 var opts = OptionsParser.fromArgv(process.argv.slice(2));
