@@ -1,6 +1,14 @@
 import { IEncoder } from './IEncoder';
 import { encoders } from './encoders';
 
+function throwIfUndefined(value: any, message: string) {
+    if (typeof value === 'undefined') {
+        throw new Error(message);
+    }
+}
+
+const encodingChoices = Object.keys(encoders).join(', ');
+
 /**
  * Parsed properties from process args
  */
@@ -15,9 +23,9 @@ export class Options implements ProcessArgs {
     readonly decode: boolean;
 
     constructor(public readonly input: string, args: ProcessArgs) {
-        if (typeof args.encoding === 'undefined') {
-            throw new Error(`Please pass a valid encoder option: ${Object.keys(encoders).join(', ')}`);
-        }
+        throwIfUndefined(input, `Please pass an input string to encode`);
+        throwIfUndefined(args.encoding, `Please pass a valid encoder option: ${encodingChoices}`);
+        throwIfUndefined(args.decode, `Please pass a valid decode option: true or false`);
 
         this.decode = args.decode;
         this.encoding = args.encoding;
