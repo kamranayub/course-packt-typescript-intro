@@ -8,7 +8,7 @@ var encoders = {
 };
 
 var input = "Hello World 🐶";
-var b64Output = "SGVsbG8gV29ybGQ=";
+var b64Output = "SGVsbG8gV29ybGQg8J+Qtg==";
 var urlOutput = "Hello%20World%20%F0%9F%90%B6";
 
 console.log("INPUT: ", input);
