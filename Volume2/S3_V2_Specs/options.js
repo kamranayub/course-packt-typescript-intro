@@ -1,25 +1,23 @@
 "use strict";
 const encoders_1 = require("./encoders");
-function exitIfNotIn(values, value) {
+function throwIfNotIn(values, value) {
     if (values.indexOf(value) === -1) {
-        console.error(`${value} is not a valid value. Valid: ${values.join(', ')}`);
-        process.exit(1);
+        throw new Error(`${value} is not a valid value. Valid: ${values.join(', ')}`);
     }
 }
-function exitIfUndefined(value, message) {
+function throwIfUndefined(value, message) {
     if (typeof value === 'undefined') {
-        console.error(message);
-        process.exit(1);
+        throw new Error(message);
     }
 }
 const encodingChoices = Object.keys(encoders_1.encoders).join(', ');
 class Options {
     constructor(input, args) {
         this.input = input;
-        exitIfUndefined(input, `Please pass an input string to encode`);
-        exitIfUndefined(args.encoding, `Please pass a valid encoder option: ${encodingChoices}`);
-        exitIfUndefined(args.decode, `Please pass a valid decode option: true or false`);
-        exitIfNotIn(Object.keys(encoders_1.encoders), args.encoding);
+        throwIfUndefined(input, `Please pass an input string to encode`);
+        throwIfUndefined(args.encoding, `Please pass a valid encoder option: ${encodingChoices}`);
+        throwIfUndefined(args.decode, `Please pass a valid decode option: true or false`);
+        throwIfNotIn(Object.keys(encoders_1.encoders), args.encoding);
         this.decode = args.decode;
         this.encoding = args.encoding;
         this.encoder = encoders_1.encoders[this.encoding];
