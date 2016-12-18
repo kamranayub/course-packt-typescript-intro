@@ -10,19 +10,23 @@ describe('Options', () => {
     })
 
     it('should require input', () => {
-        expect(() => new Options(undefined, undefined)).toThrowError('Please pass an input string to encode')
+        expect(() => new Options(undefined, undefined))
+            .toThrowError('Please pass an input string to encode')
     })
 
     it('should require encoding argument', () => {
-        expect(() => new Options(TEST_INPUT, { encoding: undefined, decode: undefined })).toThrowError(/Please pass a valid encoder option/);
+        expect(() => new Options(TEST_INPUT, { encoding: undefined, decode: undefined }))
+            .toThrowError(/Please pass a valid encoder option/);
     })
 
     it('should require decode argument', () => {
-        expect(() => new Options(TEST_INPUT, { encoding: DEFAULT_ENCODER, decode: undefined })).toThrowError('Please pass a valid decode option: true or false');
+        expect(() => new Options(TEST_INPUT, { encoding: DEFAULT_ENCODER, decode: undefined }))
+            .toThrowError('Please pass a valid decode option: true or false');
     })
 
     it('should require valid encoding', () => {
-        expect(() => new Options(TEST_INPUT, { encoding: 'foo', decode: false })).toThrowError(/foo is not a valid value/);
+        expect(() => new Options(TEST_INPUT, { encoding: 'foo', decode: false }))
+            .toThrowError(/foo is not a valid value/);
     })
 
     it('should expose input', () => {

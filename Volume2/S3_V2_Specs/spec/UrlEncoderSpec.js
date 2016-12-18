@@ -1,6 +1,7 @@
 "use strict";
 const urlencoder_1 = require("../urlencoder");
 describe('Url Encoder', () => {
+    it('is defined', () => expect(urlencoder_1.urlencoder).toBeDefined());
     it('can encode a simple string', () => {
         expect(urlencoder_1.urlencoder.encode('Hello World')).toBe('Hello%20World');
     });

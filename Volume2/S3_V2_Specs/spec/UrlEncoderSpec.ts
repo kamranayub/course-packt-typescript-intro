@@ -1,6 +1,9 @@
 import { urlencoder } from '../urlencoder';
 
 describe('Url Encoder', () => {
+
+    it('is defined', () => expect(urlencoder).toBeDefined());
+
     it('can encode a simple string', () => {
         expect(urlencoder.encode('Hello World')).toBe('Hello%20World');
     })

@@ -2,6 +2,8 @@ import { base64encoder } from '../base64encoder';
 
 describe('Base64 encoder', () => {
 
+    it('is defined', () => expect(base64encoder).toBeDefined());
+
     it('can encode a simple string', () => {
         expect(base64encoder.encode('Hello World')).toBe('SGVsbG8gV29ybGQ=');
     })
