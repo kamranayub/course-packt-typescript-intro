@@ -17,7 +17,7 @@
             "type": "node",
             "request": "launch",
             "name": "Debug Tests",
-            "program": "${workspaceRoot}/node_modules/jasmine/bin/jasmine.js",
+            "program": "${workspaceRoot}/spec/index.js",
             "cwd": "${workspaceRoot}",
             "outFiles": [],
             "sourceMaps": true

@@ -7,13 +7,14 @@
   "license": "ISC",
   "private": true,
   "scripts": {
-    "test": "node_modules/.bin/jasmine"
+    "test": "node spec/index.js"
   },
   "devDependencies": {
     "@types/jasmine": "^2.5.38",
     "@types/minimist": "^1.1.29",
     "@types/node": "0.0.2",
     "jasmine": "^2.5.2",
+    "jasmine-console-reporter": "^1.2.7",
     "minimist": "^1.2.0"
   }
 }
