@@ -12,6 +12,18 @@
             "cwd": "${workspaceRoot}",
             "outFiles": [],
             "sourceMaps": true
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Debug Tests",
+            "program": "${workspaceRoot}/node_modules/jasmine-node/lib/jasmine-node/cli.js",
+            "cwd": "${workspaceRoot}",
+            "args": [
+                "spec/"
+            ],
+            "outFiles": [],
+            "sourceMaps": true
         }
     ]
 }
