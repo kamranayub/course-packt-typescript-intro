@@ -1,3 +1,5 @@
+require('source-map-support').install();
+
 import * as OptionsParser from '../OptionsParser'
 import { DEFAULT_ENCODER, encoders } from '../encoders';
 

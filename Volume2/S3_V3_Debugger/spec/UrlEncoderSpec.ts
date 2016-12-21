@@ -1,3 +1,5 @@
+require('source-map-support').install();
+
 import { urlencoder } from '../urlencoder';
 
 describe('Url Encoder', () => {

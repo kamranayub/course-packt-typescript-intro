@@ -1,3 +1,5 @@
+require('source-map-support').install();
+
 import { base64encoder } from '../base64encoder';
 
 describe('Base64 encoder', () => {
