@@ -25,56 +25,56 @@ declare function require(dependency: string): any;
 
 // --------------- //
 
-( function( window, factory ) {
-  // universal module definition
-  /* jshint strict: false */ /*globals define, module, require */
-  if (typeof define == 'function' && define.amd ) {
-    // AMD
-    define( [
-        'get-size/get-size',
-        'unidragger/unidragger'
-      ],
-      function( getSize, Unidragger ) {
-        return factory( window, getSize, Unidragger );
-      });
-  } else if ( typeof module == 'object' && module.exports ) {
-    // CommonJS
-    module.exports = factory(
-      window,
-      require('get-size'),
-      require('unidragger')
-    );
-  } else {
-    // browser global
-    (window as any).Draggabilly = factory(
-      window,
-      (window as any).getSize,
-      (window as any).Unidragger
-    );
-  }
+(function (window, factory) {
+    // universal module definition
+    /* jshint strict: false */ /*globals define, module, require */
+    if (typeof define == 'function' && define.amd) {
+        // AMD
+        define([
+            'get-size/get-size',
+            'unidragger/unidragger'
+        ],
+            function (getSize, Unidragger) {
+                return factory(window, getSize, Unidragger);
+            });
+    } else if (typeof module == 'object' && module.exports) {
+        // CommonJS
+        module.exports = factory(
+            window,
+            require('get-size'),
+            require('unidragger')
+        );
+    } else {
+        // browser global
+        (window as any).Draggabilly = factory(
+            window,
+            (window as any).getSize,
+            (window as any).Unidragger
+        );
+    }
 
-}( window, function factory( window: Window, getSize: getSize, Unidragger: UnidraggerAbstractClass) {
+} (window, function factory(window: Window, getSize: getSize, Unidragger: UnidraggerAbstractClass) {
 
     var document = window.document;
 
-    function noop() {}
+    function noop() { }
 
     // -------------------------- helpers -------------------------- //
 
     // extend objects
-    function extend<T1, T2>( a: T1, b: T2 ): T1 & T2 {
-    for ( var prop in b ) {
-        (<any>a)[ prop ] = b[ prop ];
-    }
-    return <T1 & T2>a;
-    }
-
-    function isElement( obj ) {
-    return obj instanceof HTMLElement;
+    function extend<T1, T2>(a: T1, b: T2): T1 & T2 {
+        for (var prop in b) {
+            (<any>a)[prop] = b[prop];
+        }
+        return <T1 & T2>a;
     }
 
-    function applyGrid( value, grid, method: MathMethod = 'round') {  
-    return grid ? Math[ method ]( value / grid ) * grid : value;
+    function isElement(obj) {
+        return obj instanceof HTMLElement;
+    }
+
+    function applyGrid(value, grid, method: MathMethod = 'round') {
+        return grid ? Math[method](value / grid) * grid : value;
     }
 
     // -------------------------- requestAnimationFrame -------------------------- //
@@ -82,33 +82,33 @@ declare function require(dependency: string): any;
 
     // get rAF, prefixed, if present
     var requestAnimationFrame = window.requestAnimationFrame ||
-    window.webkitRequestAnimationFrame || (window as any).mozRequestAnimationFrame;
+        window.webkitRequestAnimationFrame || (window as any).mozRequestAnimationFrame;
 
     // fallback to setTimeout
     var lastTime = 0;
-    if ( !requestAnimationFrame )  {
-    requestAnimationFrame = function( callback ) {
-        var currTime = new Date().getTime();
-        var timeToCall = Math.max( 0, 16 - ( currTime - lastTime ) );
-        var id = setTimeout( callback, timeToCall );
-        lastTime = currTime + timeToCall;
-        return id;
-    };
+    if (!requestAnimationFrame) {
+        requestAnimationFrame = function (callback) {
+            var currTime = new Date().getTime();
+            var timeToCall = Math.max(0, 16 - (currTime - lastTime));
+            var id = setTimeout(callback, timeToCall);
+            lastTime = currTime + timeToCall;
+            return id;
+        };
     }
 
     // -------------------------- support -------------------------- //
 
     var docElem = document.documentElement;
     var transformProperty = typeof docElem.style.transform == 'string' ?
-    'transform' : 'WebkitTransform';
+        'transform' : 'WebkitTransform';
 
     var jQuery = (window as any).jQuery;
 
     // css position values that don't need to be set
     var positionValues = {
-    relative: true,
-    absolute: true,
-    fixed: true
+        relative: true,
+        absolute: true,
+        fixed: true
     };
 
     interface Point {
@@ -116,12 +116,12 @@ declare function require(dependency: string): any;
         y?: number;
     }
 
-    type Axis = 'x'|'y';
-    type MathMethod = 'round'|'ceil'|'floor';
+    type Axis = 'x' | 'y';
+    type MathMethod = 'round' | 'ceil' | 'floor';
 
     interface Options {
         handle?: string;
-        containment?: string|HTMLElement;
+        containment?: string | HTMLElement;
         axis?: Axis;
         grid?: number[];
     }
@@ -145,20 +145,20 @@ declare function require(dependency: string): any;
         handles: NodeListOf<Element>;
         containSize: { width: number, height: number };
 
-        constructor(element: string|HTMLElement, options) {
+        constructor(element: string | HTMLElement, options) {
             super();
 
             // querySelector if string
             this.element = typeof element == 'string' ?
-                <HTMLElement>document.querySelector( element ) : element;
+                <HTMLElement>document.querySelector(element) : element;
 
-            if ( jQuery ) {
-                this.$element = jQuery( this.element );
+            if (jQuery) {
+                this.$element = jQuery(this.element);
             }
 
             // options
-            this.options = extend( {}, Draggabilly.defaults );
-            this.option( options );
+            this.options = extend({}, Draggabilly.defaults);
+            this.option(options);
 
             this._create();
         }
@@ -172,7 +172,7 @@ declare function require(dependency: string): any;
         }
 
         private _create() {
-            
+
             // properties
             this.position = {};
             this._getPosition();
@@ -180,11 +180,11 @@ declare function require(dependency: string): any;
             this.startPoint = { x: 0, y: 0 };
             this.dragPoint = { x: 0, y: 0 };
 
-            this.startPosition = extend( {}, this.position );
+            this.startPosition = extend({}, this.position);
 
             // set relative positioning
-            var style = getComputedStyle( this.element );
-            if ( !positionValues[ style.position ] ) {
+            var style = getComputedStyle(this.element);
+            if (!positionValues[style.position]) {
                 this.element.style.position = 'relative';
             }
 
@@ -197,7 +197,7 @@ declare function require(dependency: string): any;
          */
         setHandles() {
             this.handles = this.options.handle ?
-                this.element.querySelectorAll( this.options.handle ) : <any>[ this.element ];
+                this.element.querySelectorAll(this.options.handle) : <any>[this.element];
 
             this.bindHandles();
         }
@@ -209,19 +209,19 @@ declare function require(dependency: string): any;
          * @param {Array} args - extra arguments
          */
         dispatchEvent(type: string, event: Event, args: any[]) {
-            var emitArgs = [ event ].concat( args );
-            this.emitEvent( type, emitArgs );
-            
+            var emitArgs = [event].concat(args);
+            this.emitEvent(type, emitArgs);
+
             // trigger jQuery event
-            if ( jQuery && this.$element ) {
-                if ( event ) {
-                // create jQuery event
-                var $event = jQuery.Event( event );
-                $event.type = type;
-                this.$element.trigger( $event, args );
+            if (jQuery && this.$element) {
+                if (event) {
+                    // create jQuery event
+                    var $event = jQuery.Event(event);
+                    $event.type = type;
+                    this.$element.trigger($event, args);
                 } else {
-                // just trigger with type if no event available
-                this.$element.trigger( type, args );
+                    // just trigger with type if no event available
+                    this.$element.trigger(type, args);
                 }
             }
         }
@@ -229,40 +229,40 @@ declare function require(dependency: string): any;
         // -------------------------- position -------------------------- //
 
         _getPosition() {
-            var style = getComputedStyle( this.element );
-            var x = this._getPositionCoord( style.left, 'width' );
-            var y = this._getPositionCoord( style.top, 'height' );
+            var style = getComputedStyle(this.element);
+            var x = this._getPositionCoord(style.left, 'width');
+            var y = this._getPositionCoord(style.top, 'height');
             // clean up 'auto' or other non-integer values
-            this.position.x = isNaN( x ) ? 0 : x;
-            this.position.y = isNaN( y ) ? 0 : y;
+            this.position.x = isNaN(x) ? 0 : x;
+            this.position.y = isNaN(y) ? 0 : y;
 
-            this._addTransformPosition( style );
+            this._addTransformPosition(style);
         }
 
-        _getPositionCoord(styleSide: string, measure: "width"|"height") {
-            if ( styleSide.indexOf('%') != -1 ) {
+        _getPositionCoord(styleSide: string, measure: "width" | "height") {
+            if (styleSide.indexOf('%') != -1) {
                 // convert percent into pixel for Safari, #75
-                var parentSize = getSize( this.element.parentNode );
+                var parentSize = getSize(this.element.parentNode);
                 // prevent not-in-DOM element throwing bug, #131
                 return !parentSize ? 0 :
-                ( parseFloat( styleSide ) / 100 ) * parentSize[ measure ];
+                    (parseFloat(styleSide) / 100) * parentSize[measure];
             }
-            return parseInt( styleSide, 10 );
+            return parseInt(styleSide, 10);
         }
 
         _addTransformPosition(style: CSSStyleDeclaration) {
-            var transform = style[ transformProperty ];
+            var transform = style[transformProperty];
             // bail out if value is 'none'
-            if ( transform.indexOf('matrix') !== 0 ) {
+            if (transform.indexOf('matrix') !== 0) {
                 return;
             }
             // split matrix(1, 0, 0, 1, x, y)
             var matrixValues = transform.split(',');
             // translate X value is in 12th or 4th position
             var xIndex = transform.indexOf('matrix3d') === 0 ? 12 : 4;
-            var translateX = parseInt( matrixValues[ xIndex ], 10 );
+            var translateX = parseInt(matrixValues[xIndex], 10);
             // translate Y value is in 13th or 5th position
-            var translateY = parseInt( matrixValues[ xIndex + 1 ], 10 );
+            var translateY = parseInt(matrixValues[xIndex + 1], 10);
             this.position.x += translateX;
             this.position.y += translateY;
         }
@@ -280,18 +280,18 @@ declare function require(dependency: string): any;
          * @param {Event} event
          * @param {Event or Touch} pointer
          */
-        pointerDown(event: Event, pointer: Event|Touch) {
-            this._dragPointerDown( event, pointer );
+        pointerDown(event: Event, pointer: Event | Touch) {
+            this._dragPointerDown(event, pointer);
             // kludge to blur focused inputs in dragger
             var focused = <HTMLElement>document.activeElement;
             // do not blur body for IE10, metafizzy/flickity#117
-            if ( focused && focused.blur && focused != document.body ) {
+            if (focused && focused.blur && focused != document.body) {
                 focused.blur();
             }
             // bind move and end events
-            this._bindPostStartEvents( event );
+            this._bindPostStartEvents(event);
             this.element.classList.add('is-pointer-down');
-            this.dispatchEvent( 'pointerDown', event, [ pointer ] );
+            this.dispatchEvent('pointerDown', event, [pointer]);
         }
 
         /**
@@ -299,10 +299,10 @@ declare function require(dependency: string): any;
          * @param {Event} event
          * @param {Event or Touch} pointer
          */
-        pointerMove(event: Event, pointer: Event|Touch) {
-            var moveVector = this._dragPointerMove( event, pointer );
-            this.dispatchEvent( 'pointerMove', event, [ pointer, moveVector ] );
-            this._dragMove( event, pointer, moveVector );
+        pointerMove(event: Event, pointer: Event | Touch) {
+            var moveVector = this._dragPointerMove(event, pointer);
+            this.dispatchEvent('pointerMove', event, [pointer, moveVector]);
+            this._dragMove(event, pointer, moveVector);
         }
 
         /**
@@ -310,8 +310,8 @@ declare function require(dependency: string): any;
          * @param {Event} event
          * @param {Event or Touch} pointer
          */
-        dragStart(event: Event, pointer: Event|Touch) {
-            if ( !this.isEnabled ) {
+        dragStart(event: Event, pointer: Event | Touch) {
+            if (!this.isEnabled) {
                 return;
             }
             this._getPosition();
@@ -326,26 +326,26 @@ declare function require(dependency: string): any;
             this.dragPoint.y = 0;
 
             this.element.classList.add('is-dragging');
-            this.dispatchEvent( 'dragStart', event, [ pointer ] );
+            this.dispatchEvent('dragStart', event, [pointer]);
             // start animation
             this.animate();
         }
 
         measureContainment() {
             var containment = this.options.containment;
-            if ( !containment ) {
+            if (!containment) {
                 return;
             }
 
             // use element if element
-            var container: HTMLElement = isElement( containment ) ? <HTMLElement>containment :
+            var container: HTMLElement = isElement(containment) ? <HTMLElement>containment :
                 // fallback to querySelector if string
-                typeof containment == 'string' ? <HTMLElement>document.querySelector( containment ) :
-                // otherwise just `true`, use the parent
-                <HTMLElement>this.element.parentNode;
+                typeof containment == 'string' ? <HTMLElement>document.querySelector(containment) :
+                    // otherwise just `true`, use the parent
+                    <HTMLElement>this.element.parentNode;
 
-            var elemSize = getSize( this.element );
-            var containerSize = getSize( container );
+            var elemSize = getSize(this.element);
+            var containerSize = getSize(container);
             var elemRect = this.element.getBoundingClientRect();
             var containerRect = container.getBoundingClientRect();
 
@@ -353,20 +353,20 @@ declare function require(dependency: string): any;
             var borderSizeY = containerSize.borderTopWidth + containerSize.borderBottomWidth;
 
             var position = this.relativeStartPosition = {
-                x: elemRect.left - ( containerRect.left + containerSize.borderLeftWidth ),
-                y: elemRect.top - ( containerRect.top + containerSize.borderTopWidth )
+                x: elemRect.left - (containerRect.left + containerSize.borderLeftWidth),
+                y: elemRect.top - (containerRect.top + containerSize.borderTopWidth)
             };
 
             this.containSize = {
-                width: ( containerSize.width - borderSizeX ) - position.x - elemSize.width,
-                height: ( containerSize.height - borderSizeY ) - position.y - elemSize.height
+                width: (containerSize.width - borderSizeX) - position.x - elemSize.width,
+                height: (containerSize.height - borderSizeY) - position.y - elemSize.height
             };
         }
 
         // ----- move event ----- //
 
-        dragMove(event: Event, pointer: Event|Touch, moveVector: Point) {
-            if ( !this.isEnabled ) {
+        dragMove(event: Event, pointer: Event | Touch, moveVector: Point) {
+            if (!this.isEnabled) {
                 return;
             }
             var dragX = moveVector.x;
@@ -376,11 +376,11 @@ declare function require(dependency: string): any;
             var gridX = grid && grid[0];
             var gridY = grid && grid[1];
 
-            dragX = applyGrid( dragX, gridX );
-            dragY = applyGrid( dragY, gridY );
+            dragX = applyGrid(dragX, gridX);
+            dragY = applyGrid(dragY, gridY);
 
-            dragX = this.containDrag( 'x', dragX, gridX );
-            dragY = this.containDrag( 'y', dragY, gridY );
+            dragX = this.containDrag('x', dragX, gridX);
+            dragY = this.containDrag('y', dragY, gridY);
 
             // constrain to axis
             dragX = this.options.axis == 'y' ? 0 : dragX;
@@ -392,28 +392,28 @@ declare function require(dependency: string): any;
             this.dragPoint.x = dragX;
             this.dragPoint.y = dragY;
 
-            this.dispatchEvent( 'dragMove', event, [ pointer, moveVector ] );
+            this.dispatchEvent('dragMove', event, [pointer, moveVector]);
         }
 
         containDrag(axis: Axis, drag: number, grid: number) {
-            if ( !this.options.containment ) {
+            if (!this.options.containment) {
                 return drag;
             }
             var measure = axis == 'x' ? 'width' : 'height';
 
-            var rel = this.relativeStartPosition[ axis ];
-            var min = applyGrid( -rel, grid, 'ceil' );
-            var max = this.containSize[ measure ];
-            max = applyGrid( max, grid, 'floor' );
-            return  Math.min( max, Math.max( min, drag ) );
+            var rel = this.relativeStartPosition[axis];
+            var min = applyGrid(-rel, grid, 'ceil');
+            var max = this.containSize[measure];
+            max = applyGrid(max, grid, 'floor');
+            return Math.min(max, Math.max(min, drag));
         }
 
         // ----- end event ----- //
 
-        pointerUp(event: Event, pointer: Event|Touch) {
+        pointerUp(event: Event, pointer: Event | Touch) {
             this.element.classList.remove('is-pointer-down');
-            this.dispatchEvent( 'pointerUp', event, [ pointer ] );
-            this._dragPointerUp( event, pointer );
+            this.dispatchEvent('pointerUp', event, [pointer]);
+            this._dragPointerUp(event, pointer);
         }
 
         /**
@@ -421,24 +421,24 @@ declare function require(dependency: string): any;
          * @param {Event} event
          * @param {Event or Touch} pointer
          */
-        dragEnd(event?: Event, pointer?: Event|Touch) {
-            if ( !this.isEnabled ) {
+        dragEnd(event?: Event, pointer?: Event | Touch) {
+            if (!this.isEnabled) {
                 return;
             }
             // use top left position when complete
-            if ( transformProperty ) {
-                this.element.style[ transformProperty ] = '';
+            if (transformProperty) {
+                this.element.style[transformProperty] = '';
                 this.setLeftTop();
             }
             this.element.classList.remove('is-dragging');
-            this.dispatchEvent( 'dragEnd', event, [ pointer ] );
+            this.dispatchEvent('dragEnd', event, [pointer]);
         }
 
         // -------------------------- animation -------------------------- //
 
         animate() {
             // only render and animate if dragging
-            if ( !this.isDragging ) {
+            if (!this.isDragging) {
                 return;
             }
 
@@ -452,18 +452,18 @@ declare function require(dependency: string): any;
         // left/top positioning
         setLeftTop() {
             this.element.style.left = this.position.x + 'px';
-            this.element.style.top  = this.position.y + 'px';
+            this.element.style.top = this.position.y + 'px';
         }
 
         positionDrag() {
-            this.element.style[ transformProperty ] = 'translate3d( ' + this.dragPoint.x +
+            this.element.style[transformProperty] = 'translate3d( ' + this.dragPoint.x +
                 'px, ' + this.dragPoint.y + 'px, 0)';
         }
 
         // ----- staticClick ----- //
 
-        staticClick(event: Event, pointer: Event|Touch) {
-            this.dispatchEvent( 'staticClick', event, [ pointer ] );
+        staticClick(event: Event, pointer: Event | Touch) {
+            this.dispatchEvent('staticClick', event, [pointer]);
         }
 
         // ----- methods ----- //
@@ -474,7 +474,7 @@ declare function require(dependency: string): any;
 
         disable() {
             this.isEnabled = false;
-            if ( this.isDragging ) {
+            if (this.isDragging) {
                 this.dragEnd();
             }
         }
@@ -482,14 +482,14 @@ declare function require(dependency: string): any;
         destroy() {
             this.disable();
             // reset styles
-            this.element.style[ transformProperty ] = '';
+            this.element.style[transformProperty] = '';
             this.element.style.left = '';
             this.element.style.top = '';
             this.element.style.position = '';
             // unbind handles
             this.unbindHandles();
             // remove jQuery data
-            if ( this.$element ) {
+            if (this.$element) {
                 this.$element.removeData('draggabilly');
             }
         }
@@ -499,8 +499,8 @@ declare function require(dependency: string): any;
         _init = noop;
     }
 
-    if ( jQuery && jQuery.bridget ) {
-    jQuery.bridget( 'draggabilly', Draggabilly );
+    if (jQuery && jQuery.bridget) {
+        jQuery.bridget('draggabilly', Draggabilly);
     }
 
     // -----  ----- //
