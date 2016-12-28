@@ -20,7 +20,7 @@ gulp.task('typescript', function () {
 
 gulp.task('watch', ['typescript'], function () {
   gulp.watch('*.ts', ['typescript']);
-})
+});
 
 // ----- lint ----- //
 
