@@ -1,12 +1,8 @@
 {
     "compileOnSave": true,
     "compilerOptions": {
-        "module": "umd",
-        "declaration": true,
-        "types": [
-            "get-size.d.ts",
-            "unidragger.d.ts"
-        ]
+        "module": "none",
+        "declaration": true
     },
     "files": [
         "draggabilly.ts"

@@ -1,3 +1,12 @@
-export as namespace getSize;
-export = getSize;
-declare function getSize(el: Node): number;
+interface Size {
+    borderLeftWidth: number;
+    borderRightWidth: number;
+    borderTopWidth: number;
+    borderBottomWidth: number;
+    width: number;
+    height: number;
+}
+
+declare interface getSizeFunction {
+    (element: Node): Size;
+}
