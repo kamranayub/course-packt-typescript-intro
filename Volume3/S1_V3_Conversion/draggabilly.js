@@ -11,6 +11,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 /// <reference path="get-size.d.ts" />
 /// <reference path="unidragger.d.ts" />
+/// <reference path="node_modules/@types/jquery/index.d.ts" />
 // --------------- //
 /* jshint browser: true, strict: true, undef: true, unused: true */
 (function (window, factory) {
@@ -106,7 +107,7 @@ var __extends = (this && this.__extends) || function (d, b) {
         };
         Draggabilly.prototype._create = function () {
             // properties
-            this.position = {};
+            this.position = { x: 0, y: 0 };
             this._getPosition();
             this.startPoint = { x: 0, y: 0 };
             this.dragPoint = { x: 0, y: 0 };

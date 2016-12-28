@@ -3,7 +3,7 @@ interface MoveVector {
     y: number;
 }
 
-declare interface UnidraggerAbstractClass {
+declare interface UnidraggerConstructor {
     new (): Unidragger;
 }
 

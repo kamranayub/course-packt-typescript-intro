@@ -7,6 +7,7 @@
 
 /// <reference path="get-size.d.ts" />
 /// <reference path="unidragger.d.ts" />
+/// <reference path="node_modules/@types/jquery/index.d.ts" />
 
 // -------------------------- modules -------------------------- //
 
@@ -21,11 +22,26 @@ declare var module: {
 
 declare function require(dependency: string): any;
 
+// augment jQuery types
+
+interface JQueryEventConstructor {
+    (src: Event): JQueryEventObject;
+    new (src: Event): JQueryEventObject;
+}
+
+interface JQueryEventObject {
+    type: string; /* force writeable */
+}
+
+interface JQueryStatic {
+    bridget(name: string, ctor: Function);
+}
+
 // --------------- //
 
 /* jshint browser: true, strict: true, undef: true, unused: true */
 
-(function (window, factory) {
+(function (window: any, factory) {
     // universal module definition
     /* jshint strict: false */ /*globals define, module, require */
     if (typeof define == 'function' && define.amd) {
@@ -46,14 +62,14 @@ declare function require(dependency: string): any;
         );
     } else {
         // browser global
-        (window as any).Draggabilly = factory(
+        window.Draggabilly = factory(
             window,
-            (window as any).getSize,
-            (window as any).Unidragger
+            window.getSize,
+            window.Unidragger
         );
     }
 
-} (window, function factory(window: Window, getSize: getSize, Unidragger: UnidraggerAbstractClass) {
+} (window, function factory(window: Window, getSize: getSizeFunction, Unidragger: UnidraggerConstructor) {
     'use strict';
     
     var document = window.document;
@@ -103,7 +119,7 @@ declare function require(dependency: string): any;
     var transformProperty = typeof docElem.style.transform == 'string' ?
         'transform' : 'WebkitTransform';
 
-    var jQuery = (window as any).jQuery;
+    var jQuery: JQueryStatic = (window as any).jQuery;
 
     // css position values that don't need to be set
     var positionValues = {
@@ -113,8 +129,8 @@ declare function require(dependency: string): any;
     };
 
     interface Point {
-        x?: number;
-        y?: number;
+        x: number;
+        y: number;
     }
 
     type Axis = 'x' | 'y';
@@ -122,7 +138,7 @@ declare function require(dependency: string): any;
 
     interface Options {
         handle?: string;
-        containment?: string | HTMLElement;
+        containment?: string | HTMLElement | boolean;
         axis?: Axis;
         grid?: number[];
     }
@@ -136,17 +152,17 @@ declare function require(dependency: string): any;
         isEnabled: boolean;
         isDragging: boolean;
         element: HTMLElement;
-        $element: any;
+        $element: JQuery;
         options: Options;
         position: Point;
         relativeStartPosition: Point;
         startPoint: Point;
         dragPoint: Point;
         startPosition: Point;
-        handles: NodeListOf<Element>;
+        handles: Element[];
         containSize: { width: number, height: number };
 
-        constructor(element: string | HTMLElement, options) {
+        constructor(element: string | HTMLElement, options: Options) {
             super();
 
             // querySelector if string
@@ -168,14 +184,14 @@ declare function require(dependency: string): any;
          * set options
          * @param opts
          */
-        option(opts) {
+        option(opts: Partial<Options>) {
             extend(this.options, opts);
         }
 
         private _create() {
 
             // properties
-            this.position = {};
+            this.position = { x: 0, y: 0 };
             this._getPosition();
 
             this.startPoint = { x: 0, y: 0 };
@@ -198,7 +214,7 @@ declare function require(dependency: string): any;
          */
         setHandles() {
             this.handles = this.options.handle ?
-                this.element.querySelectorAll(this.options.handle) : <any>[this.element];
+                <any>this.element.querySelectorAll(this.options.handle) : [this.element];
 
             this.bindHandles();
         }

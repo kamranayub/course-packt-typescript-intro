@@ -7,6 +7,6 @@ interface Size {
     height: number;
 }
 
-declare interface getSize {
+declare interface getSizeFunction {
     (element: Node): Size;
 }
