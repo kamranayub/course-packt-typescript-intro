@@ -1,11 +1,18 @@
-/// <reference path="get-size.d.ts" />
-/// <reference path="unidragger.d.ts" />
+/*!
+ * Draggabilly v2.1.1
+ * Make that shiz draggable
+ * http://draggabilly.desandro.com
+ * MIT license
+ */
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+/// <reference path="get-size.d.ts" />
+/// <reference path="unidragger.d.ts" />
 // --------------- //
+/* jshint browser: true, strict: true, undef: true, unused: true */
 (function (window, factory) {
     // universal module definition
     /* jshint strict: false */ /*globals define, module, require */
@@ -27,6 +34,7 @@ var __extends = (this && this.__extends) || function (d, b) {
         window.Draggabilly = factory(window, window.getSize, window.Unidragger);
     }
 }(window, function factory(window, getSize, Unidragger) {
+    'use strict';
     var document = window.document;
     function noop() { }
     // -------------------------- helpers -------------------------- //

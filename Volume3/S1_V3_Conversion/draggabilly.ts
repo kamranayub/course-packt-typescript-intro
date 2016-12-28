@@ -1,6 +1,3 @@
-/// <reference path="get-size.d.ts" />
-/// <reference path="unidragger.d.ts" />
-
 /*!
  * Draggabilly v2.1.1
  * Make that shiz draggable
@@ -8,7 +5,8 @@
  * MIT license
  */
 
-/*jshint browser: true, strict: true, undef: true, unused: true */
+/// <reference path="get-size.d.ts" />
+/// <reference path="unidragger.d.ts" />
 
 // -------------------------- modules -------------------------- //
 
@@ -24,6 +22,8 @@ declare var module: {
 declare function require(dependency: string): any;
 
 // --------------- //
+
+/* jshint browser: true, strict: true, undef: true, unused: true */
 
 (function (window, factory) {
     // universal module definition
@@ -54,7 +54,8 @@ declare function require(dependency: string): any;
     }
 
 } (window, function factory(window: Window, getSize: getSize, Unidragger: UnidraggerAbstractClass) {
-
+    'use strict';
+    
     var document = window.document;
 
     function noop() { }
