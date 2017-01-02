@@ -1,9 +1,6 @@
-/// <reference path="../augmentations/monk.d.ts" />
-
 import express = require('express');
-// Interfaces
-import User = require('../interfaces/User');
-import { AppRequest, AppRequestWithBody, AppRequestWithParams } from '../interfaces/AppRequest';
+
+import { AppRequest, AppRequestWithBody, AppRequestWithParams } from '../server/AppRequest';
 
 var router = express.Router();
 
@@ -11,11 +8,8 @@ var router = express.Router();
  * GET userlist.
  */
 router.get('/userlist', function(req: AppRequest, res) {
-    var db = req.db;
-    var collection = db.get<User>('userlist');
-
-    collection.find({}, {}, function(err, docs){
-        res.json(docs);
+    req.userService.getAll(function (users) {
+        res.json(users);
     });
 });
 
@@ -23,13 +17,8 @@ router.get('/userlist', function(req: AppRequest, res) {
  * POST to adduser.
  */
 router.post('/adduser', function(req: AppRequestWithBody<User>, res) {
-    var db = req.db;
-    var collection = db.get<User>('userlist');
-    
-    collection.insert(req.body, function(err, result){
-        res.send(
-            (err === null) ? { msg: '' } : { msg: err }
-        );
+    req.userService.create(req.body, function (result) {
+        res.send(result);
     });
 });
 
@@ -37,12 +26,8 @@ router.post('/adduser', function(req: AppRequestWithBody<User>, res) {
  * DELETE to deleteuser.
  */
 router.delete('/deleteuser/:id', function(req: AppRequestWithParams<{ id: string }>, res) {
-    var db = req.db;
-    var collection = db.get<User>('userlist');
-    var userToDelete = req.params.id;
-
-    collection.remove({ _id: userToDelete }, function(err: string) {
-        res.send((err === null) ? { msg: '' } : { msg:'error: ' + err });
+    req.userService.remove(req.params.id, function (result) {
+        res.send(result);
     });
 });
 

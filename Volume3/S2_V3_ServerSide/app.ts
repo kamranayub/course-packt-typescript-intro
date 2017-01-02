@@ -4,15 +4,15 @@ import logger = require('morgan');
 import cookieParser = require('cookie-parser');
 import bodyParser = require('body-parser');
 import monk = require('monk');
-// Interfaces
-import { AppRequest } from './interfaces/AppRequest';
 
-var db = monk('localhost:27017/nodetest2');
+import { AppRequest } from './server/AppRequest';
+import UserMongoService = require('./server/UserMongoService');
 
 import routes = require('./routes/index');
 import users = require('./routes/users');
 
 var app = express();
+var db = monk('localhost:27017/nodetest2');
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -26,7 +26,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Make our db accessible to our router
 app.use(function(req: AppRequest, res, next) {
-    req.db = db;
+    req.userService = new UserMongoService(db);
     next();
 });
 

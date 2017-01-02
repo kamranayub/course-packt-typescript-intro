@@ -1,5 +1,4 @@
 import express = require('express');
-import monk = require('monk');
 
 /**
  * Represents our extended Express web request
@@ -7,9 +6,9 @@ import monk = require('monk');
 export interface AppRequest extends express.Request {
 
     /**
-     * Expose MongoDB database on requests
+     * Expose user service on request
      */
-    db: monk.Monk;
+    userService: UserService;
 }
 
 /**

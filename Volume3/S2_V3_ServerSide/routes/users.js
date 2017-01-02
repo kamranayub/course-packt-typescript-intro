@@ -1,4 +1,3 @@
-/// <reference path="../augmentations/monk.d.ts" />
 "use strict";
 var express = require("express");
 var router = express.Router();
@@ -6,31 +5,24 @@ var router = express.Router();
  * GET userlist.
  */
 router.get('/userlist', function (req, res) {
-    var db = req.db;
-    var collection = db.get('userlist');
-    collection.find({}, {}, function (err, docs) {
-        res.json(docs);
+    req.userService.getAll(function (users) {
+        res.json(users);
     });
 });
 /*
  * POST to adduser.
  */
 router.post('/adduser', function (req, res) {
-    var db = req.db;
-    var collection = db.get('userlist');
-    collection.insert(req.body, function (err, result) {
-        res.send((err === null) ? { msg: '' } : { msg: err });
+    req.userService.create(req.body, function (result) {
+        res.send(result);
     });
 });
 /*
  * DELETE to deleteuser.
  */
 router.delete('/deleteuser/:id', function (req, res) {
-    var db = req.db;
-    var collection = db.get('userlist');
-    var userToDelete = req.params.id;
-    collection.remove({ _id: userToDelete }, function (err) {
-        res.send((err === null) ? { msg: '' } : { msg: 'error: ' + err });
+    req.userService.remove(req.params.id, function (result) {
+        res.send(result);
     });
 });
 module.exports = router;
