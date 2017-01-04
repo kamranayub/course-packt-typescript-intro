@@ -8,4 +8,4 @@ function init(Schema, mongoose) {
   return mongoose.model('Todos', TheSchema);
 }
 
-module.exports.init = init;
+export = { init: init }

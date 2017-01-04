@@ -3,22 +3,24 @@
  */
 
 import express = require('express')
-import logger = require('mime')
-import routes = require('./routes')
-import user = require('./routes/user')
 import http = require('http')
 import path = require('path')
+import logger = require('morgan')
+import bodyParser = require('body-parser')
+import methodOverride = require('method-override')
+import errorhandler = require('errorhandler')
 import mongoose = require('mongoose')
 import io = require('socket.io')
-import todos = require('./models/todos.js')
+import routes = require('./routes')
+import todos = require('./models/todos')
 
-var mongoURI =  process.env.MONGOLAB_URI || 'mongodb://localhost/todos'
+var mongoURI = 'mongodb://localhost/todos'
   , Schema = mongoose.Schema
   , ObjectID = Schema.Types.ObjectId
   , Todo = todos.init(Schema, mongoose);
 
-var connectWithRetry = function() {
-  return mongoose.connect(mongoURI, function(err) {
+var connectWithRetry = function () {
+  return mongoose.connect(mongoURI, function (err) {
     if (err) {
       console.error('Failed to connect to mongo on startup - retrying in 5 sec', err);
       setTimeout(connectWithRetry, 5000);
@@ -28,29 +30,27 @@ var connectWithRetry = function() {
 
 connectWithRetry();
 
-mongoose.connection.on('open', function() {
+mongoose.connection.on('open', function () {
   console.log("connected to mongodb");
 });
 
 var app = express();
 
-app.configure(function() {
-  app.set('port', process.env.PORT || 8080);
-  app.set('views', __dirname + '/views');
-  app.set('view engine', 'jade');
-  app.use(express.favicon());
-  app.use(express.logger('dev'));
-  app.use(express.bodyParser());
-  app.use(express.methodOverride());
-  app.use(app.router);
-  app.use(express.static(path.join(__dirname, 'public')));
-});
+app.set('port', process.env.PORT || 2982);
+app.set('views', __dirname + '/views');
+app.set('view engine', 'jade');
 
-app.configure('development', function() {
-  app.use(express.errorHandler());
-});
+app.use(logger('dev'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(methodOverride());
+app.use(express.static(path.join(__dirname, 'public')));
 
-var server = http.createServer(app).listen(app.get('port'), function() {
+if (app.get('env') === 'development') {
+  app.use(errorhandler());
+}
+
+var server = http.createServer(app).listen(app.get('port'), function () {
   console.log("Express server listening on port " + app.get('port'));
 });
 
@@ -59,20 +59,19 @@ var sio = io.listen(server);
 //User online user count variable
 var users = 0;
 
-var address_list = new Array();
+var address_list: { [key: string]: { list: string[] } } = {};
 
 sio.sockets.on('connection', function (socket) {
   var address = socket.handshake.address;
+  var socketid: string[];
 
   if (address_list[address]) {
-    var socketid = address_list[address].list;
+    socketid = address_list[address].list;
     socketid.push(socket.id);
     address_list[address].list = socketid;
   } else {
-    var socketid = new Array();
-    socketid.push(socket.id);
-    address_list[address] = new Array();
-    address_list[address].list = socketid;
+    socketid = [socket.id];
+    address_list[address] = { list: socketid };
   }
 
   users = Object.keys(address_list).length;
@@ -85,8 +84,8 @@ sio.sockets.on('connection', function (socket) {
     function: list all todos
     response: all todos, json format
   */
-  Todo.find({}, function(err, todos) {
-    socket.emit('all',todos);
+  Todo.find({}, function (err, todos) {
+    socket.emit('all', todos);
   });
 
   /*
@@ -94,15 +93,15 @@ sio.sockets.on('connection', function (socket) {
     function: add a todo
     Response: Todo object
   */
-  socket.on('add', function(data) {
+  socket.on('add', function (data) {
     var todo = new Todo({
       title: data.title,
       complete: false
     });
 
-    todo.save(function(err) {
+    todo.save(function (err) {
       if (err) throw err;
-      socket.emit('added', todo );
+      socket.emit('added', todo);
       socket.broadcast.emit('added', todo);
     });
   });
@@ -112,11 +111,11 @@ sio.sockets.on('connection', function (socket) {
     function: delete a todo
     response: the delete todo id, json object
   */
-  socket.on('delete', function(data) {
-    Todo.findById(data.id, function(err, todo) {
-      todo.remove(function(err) {
+  socket.on('delete', function (data) {
+    Todo.findById(data.id, function (err, todo) {
+      todo.remove(function (err) {
         if (err) throw err;
-        socket.emit('deleted', data );
+        socket.emit('deleted', data);
         socket.broadcast.emit('deleted', data);
       });
     });
@@ -127,15 +126,15 @@ sio.sockets.on('connection', function (socket) {
     function: edit a todo
     response: edited todo, json object
   */
-  socket.on('edit', function(data) {
-     Todo.findById(data.id, function(err, todo){
-        todo.title = data.title;
-        todo.save(function(err){
-          if(err) throw err;
-          socket.emit('edited', todo);
-          socket.broadcast.emit('edited', todo);
-        });
+  socket.on('edit', function (data) {
+    Todo.findById(data.id, function (err, todo) {
+      todo.title = data.title;
+      todo.save(function (err) {
+        if (err) throw err;
+        socket.emit('edited', todo);
+        socket.broadcast.emit('edited', todo);
       });
+    });
   });
 
   /*
@@ -143,12 +142,12 @@ sio.sockets.on('connection', function (socket) {
     function: change the status of a todo
     response: the todo that was edited, json object
   */
-  socket.on('changestatus', function(data) {
-    Todo.findById(data.id, function(err, todo) {
+  socket.on('changestatus', function (data) {
+    Todo.findById(data.id, function (err, todo) {
       todo.complete = data.status == 'complete' ? true : false;
-      todo.save(function(err) {
-        if(err) throw err;
-        socket.emit('statuschanged', data );
+      todo.save(function (err) {
+        if (err) throw err;
+        socket.emit('statuschanged', data);
         socket.broadcast.emit('statuschanged', data);
       });
     });
@@ -159,12 +158,12 @@ sio.sockets.on('connection', function (socket) {
     function: change the status of all todos
     response: the status, json object
   */
-  socket.on('allchangestatus', function(data) {
+  socket.on('allchangestatus', function (data) {
     var master_status = data.status == 'complete' ? true : false;
-    Todo.find({}, function(err, todos) {
-      for(var i = 0; i < todos.length; i++) {
+    Todo.find({}, function (err, todos) {
+      for (var i = 0; i < todos.length; i++) {
         todos[i].complete = master_status;
-        todos[i].save(function(err) {
+        todos[i].save(function (err) {
           if (err) throw err;
           socket.emit('allstatuschanged', data);
           socket.broadcast.emit('allstatuschanged', data);
@@ -174,10 +173,10 @@ sio.sockets.on('connection', function (socket) {
   });
 
   //disconnect state
-  socket.on('disconnect', function() {
+  socket.on('disconnect', function () {
     var socketid = address_list[address].list;
     delete socketid[socketid.indexOf(socket.id)];
-    if(Object.keys(socketid).length == 0) {
+    if (Object.keys(socketid).length == 0) {
       delete address_list[address];
     }
     users = Object.keys(address_list).length;
@@ -188,4 +187,4 @@ sio.sockets.on('connection', function (socket) {
 });
 
 //Our index page
-app.get('/', routes.index);
+app.use('/', routes.index);
