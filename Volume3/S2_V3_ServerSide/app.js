@@ -5,7 +5,7 @@ var logger = require("morgan");
 var cookieParser = require("cookie-parser");
 var bodyParser = require("body-parser");
 var monk = require("monk");
-var UserMongoService = require("./server/UserMongoService");
+var MongoUserService = require("./server/MongoUserService");
 var routes = require("./routes/index");
 var users = require("./routes/users");
 var app = express();
@@ -20,7 +20,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 // Make our db accessible to our router
 app.use(function (req, res, next) {
-    req.userService = new UserMongoService(db);
+    req.userService = new MongoUserService(db);
     next();
 });
 app.use('/', routes);

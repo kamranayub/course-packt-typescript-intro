@@ -2,7 +2,7 @@ import monk = require('monk');
 
 const UserCollection = 'userlist';
 
-class UserMongoService implements UserService {    
+class MongoUserService implements UserService {    
 
     constructor(private _db: monk.Monk) {
     }
@@ -53,4 +53,4 @@ declare module 'monk' {
     }
 }
 
-export = UserMongoService
+export = MongoUserService

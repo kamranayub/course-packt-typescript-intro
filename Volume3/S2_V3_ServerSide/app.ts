@@ -6,7 +6,7 @@ import bodyParser = require('body-parser');
 import monk = require('monk');
 
 import { AppRequest } from './server/AppRequest';
-import UserMongoService = require('./server/UserMongoService');
+import MongoUserService = require('./server/MongoUserService');
 
 import routes = require('./routes/index');
 import users = require('./routes/users');
@@ -26,7 +26,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Make our db accessible to our router
 app.use(function(req: AppRequest, res, next) {
-    req.userService = new UserMongoService(db);
+    req.userService = new MongoUserService(db);
     next();
 });
 
