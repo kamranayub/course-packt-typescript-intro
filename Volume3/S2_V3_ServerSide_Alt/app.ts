@@ -2,22 +2,20 @@
  * Module dependencies.
  */
 
-var express = require('express')
-  , http = require('http')
-  , path = require('path')
-  , logger = require('morgan')
-  , bodyParser = require('body-parser')
-  , methodOverride = require('method-override')
-  , errorhandler = require('errorhandler')
-  , mongoose = require('mongoose')
-  , io = require('socket.io')
-  , routes = require('./routes')
-    
-  , mongoURI =  process.env.MONGOLAB_URI || 'mongodb://localhost/todos'
+import express = require('express')
+import logger = require('mime')
+import routes = require('./routes')
+import user = require('./routes/user')
+import http = require('http')
+import path = require('path')
+import mongoose = require('mongoose')
+import io = require('socket.io')
+import todos = require('./models/todos.js')
+
+var mongoURI =  process.env.MONGOLAB_URI || 'mongodb://localhost/todos'
   , Schema = mongoose.Schema
   , ObjectID = Schema.Types.ObjectId
-  , Todo = require('./models/todos.js').init(Schema, mongoose)
-  ;
+  , Todo = todos.init(Schema, mongoose);
 
 var connectWithRetry = function() {
   return mongoose.connect(mongoURI, function(err) {
@@ -36,19 +34,21 @@ mongoose.connection.on('open', function() {
 
 var app = express();
 
-app.set('port', process.env.PORT || 2982);
-app.set('views', __dirname + '/views');
-app.set('view engine', 'jade');
+app.configure(function() {
+  app.set('port', process.env.PORT || 8080);
+  app.set('views', __dirname + '/views');
+  app.set('view engine', 'jade');
+  app.use(express.favicon());
+  app.use(express.logger('dev'));
+  app.use(express.bodyParser());
+  app.use(express.methodOverride());
+  app.use(app.router);
+  app.use(express.static(path.join(__dirname, 'public')));
+});
 
-app.use(logger('dev'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(methodOverride());
-app.use(express.static(path.join(__dirname, 'public')));
-
-if (app.get('env') === 'development') {
-  app.use(errorhandler());
-}
+app.configure('development', function() {
+  app.use(express.errorHandler());
+});
 
 var server = http.createServer(app).listen(app.get('port'), function() {
   console.log("Express server listening on port " + app.get('port'));
@@ -188,4 +188,4 @@ sio.sockets.on('connection', function (socket) {
 });
 
 //Our index page
-app.use('/', routes.index);
+app.get('/', routes.index);
