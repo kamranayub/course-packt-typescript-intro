@@ -1,54 +1,18 @@
 extends layout
 
 block content
-    h1= title
-    p Welcome to our test
-
-    // Wrapper
-    #wrapper
-
-        // USER INFO
-        #userInfo
-            h2 User Info
-            p
-                strong Name:
-                |  <span id='userInfoName'></span>
-                br
-                strong Age:
-                |  <span id='userInfoAge'></span>
-                br
-                strong Gender:
-                |  <span id='userInfoGender'></span>
-                br
-                strong Location:
-                |  <span id='userInfoLocation'></span>
-        // /USER INFO
-
-        // USER LIST
-        h2 User List
-        #userList
-            table
-                thead
-                    th UserName
-                    th Email
-                    th Delete?
-                tbody
-        // /USER LIST
-
-        // ADD USER
-        h2 Add User
-        #addUser
-            fieldset
-                input#inputUserName(type='text', placeholder='Username')
-                input#inputUserEmail(type='text', placeholder='Email')
-                br
-                input#inputUserFullname(type='text', placeholder='Full Name')
-                input#inputUserAge(type='text', placeholder='Age')
-                br
-                input#inputUserLocation(type='text', placeholder='Location')
-                input#inputUserGender(type='text', placeholder='gender')
-                br
-                button#btnAddUser Add User
-        // /ADD USER
-
-    // /WRAPPER
+     p <a href="https://github.com/ishuah91/Nodejs-MongoDb-TodoMVC"><img style="position: absolute; top: 0; left: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_left_red_aa0000.png" alt="Fork me on GitHub"></a>
+     section#todo
+      header#header
+       h1 todos
+       form( id='todo-form')
+        input(id='new-todo', placeholder="What needs to be done?", name='title')
+      section#main
+       input(id="toggle-all", type="checkbox")
+       ul#todo-list
+      footer#footer
+     div#info
+      p Double-click to edit a todo
+      p Written by <a href="https://twitter.com/ishuah_" target="blank_">Ishuah Kariuki</a> based on TodoMVC by <a href="https://github.com/addyosmani" target="blank_">Addy Osmani</a>
+      p Node.js | Express.js | Mongoose.js | MongoDb
+      p The write-up, coming soon
