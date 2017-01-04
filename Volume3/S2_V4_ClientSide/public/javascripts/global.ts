@@ -1,5 +1,5 @@
 /// <reference path="../../shared/User.ts" />
-/// <reference path="UserAjaxService.ts" />
+/// <reference path="AjaxUserService.ts" />
 
 // Userlist data array for filling in info box
 var userListData: User[] = [];
