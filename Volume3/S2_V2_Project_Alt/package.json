@@ -1,0 +1,21 @@
+{
+  "name": "todo",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node app",
+    "build": "node_modules/.bin/tsc -p ."
+  },
+  "dependencies": {
+    "express": "3.0.0rc4",
+    "jade": "*",
+    "mongoose": "*",
+    "socket.io": "*"
+  },
+  "devDependencies": {
+    "@types/express": "^4.0.34",
+    "@types/mongoose": "^4.7.2",
+    "@types/socket.io": "^1.4.27",
+    "typescript": "^2.1.4"
+  }
+}
