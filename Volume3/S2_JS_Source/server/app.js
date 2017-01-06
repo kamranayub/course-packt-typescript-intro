@@ -16,7 +16,7 @@ var express = require('express')
   , mongoURI =  'mongodb://localhost/todos'
   , Schema = mongoose.Schema
   , ObjectID = Schema.Types.ObjectId
-  , Todo = require('./models/todos.js').init(Schema, mongoose)
+  , Todo = require('./todos.js').init(Schema, mongoose)
   ;
 
 var connectWithRetry = function() {
@@ -44,7 +44,7 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(methodOverride());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, '..', 'public')));
 
 if (app.get('env') === 'development') {
   app.use(errorhandler());
