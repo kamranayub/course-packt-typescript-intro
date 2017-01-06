@@ -13,10 +13,10 @@ import mongoose = require('mongoose')
 import io = require('socket.io')
 
 import routes = require('./routes/index')
-import todos = require('./server/todos')
-import { AppServerSocket } from './server/sockets'
-import { SocketEvents } from './common/events';
-import * as Models from './common/models'
+import todos = require('./todos')
+import { AppServerSocket } from './sockets'
+import { SocketEvents } from '../common/events';
+import * as Models from '../common/models'
 
 var mongoURI = 'mongodb://localhost/todos'
   , Schema = mongoose.Schema
@@ -48,7 +48,7 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(methodOverride());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, '..', 'public')));
 
 if (app.get('env') === 'development') {
   app.use(errorhandler());

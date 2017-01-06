@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "start": "node app",
+    "start": "node server/app",
     "tsc": "node_modules/.bin/tsc -p .",
     "browserify": "node_modules/.bin/browserify client/app.js --o public/javascripts/app.js",    
     "build": "npm run tsc && npm run browserify"
