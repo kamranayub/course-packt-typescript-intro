@@ -15,7 +15,7 @@ import io = require('socket.io')
 import routes = require('./routes/index')
 import todos = require('./todos')
 import { AppServerSocket } from './sockets'
-import { SocketEvents } from '../common/events';
+import * as SocketEvents from '../common/events';
 import * as Models from '../common/models'
 
 var mongoURI = 'mongodb://localhost/todos'
@@ -80,8 +80,8 @@ sio.sockets.on('connection', function (socket: AppServerSocket) {
 
   users = Object.keys(address_list).length;
 
-  socket.emit(SocketEvents.count, { count: users });
-  socket.broadcast.emit(SocketEvents.count, { count: users });
+  socket.emit(SocketEvents.COUNT, { count: users });
+  socket.broadcast.emit(SocketEvents.COUNT, { count: users });
 
   /*
     handles 'all' namespace
@@ -89,7 +89,7 @@ sio.sockets.on('connection', function (socket: AppServerSocket) {
     response: all todos, json format
   */
   Todo.find({}, function (err, todos) {
-    socket.emit(SocketEvents.all, todos);
+    socket.emit(SocketEvents.ALL, todos);
   });
 
   /*
@@ -97,7 +97,7 @@ sio.sockets.on('connection', function (socket: AppServerSocket) {
     function: add a todo
     Response: Todo object
   */
-  socket.on(SocketEvents.add, function (data: Models.Todo) {
+  socket.on(SocketEvents.ADD, function (data: Models.Todo) {
     var todo = new Todo({
       title: data.title,
       complete: false
@@ -105,8 +105,8 @@ sio.sockets.on('connection', function (socket: AppServerSocket) {
 
     todo.save(function (err) {
       if (err) throw err;
-      socket.emit('added', todo);
-      socket.broadcast.emit('added', todo);
+      socket.emit(SocketEvents.ADDED, todo);
+      socket.broadcast.emit(SocketEvents.ADDED, todo);
     });
   });
 
@@ -115,12 +115,12 @@ sio.sockets.on('connection', function (socket: AppServerSocket) {
     function: delete a todo
     response: the delete todo id, json object
   */
-  socket.on(SocketEvents.delete, function (data: Models.DeleteTodoCommand) {
+  socket.on(SocketEvents.DELETE, function (data: Models.DeleteTodoCommand) {
     Todo.findById(data.id, function (err, todo) {
       todo.remove(function (err) {
         if (err) throw err;
-        socket.emit('deleted', data);
-        socket.broadcast.emit('deleted', data);
+        socket.emit(SocketEvents.DELETED, data);
+        socket.broadcast.emit(SocketEvents.DELETED, data);
       });
     });
   });
@@ -130,17 +130,13 @@ sio.sockets.on('connection', function (socket: AppServerSocket) {
     function: edit a todo
     response: edited todo, json object
   */
-  socket.on(SocketEvents.edit, function (data: Models.Todo) {
-    if (typeof data.id === 'undefined') {
-      return;
-    }
-
+  socket.on(SocketEvents.EDIT, function (data: Models.Todo) {
     Todo.findById(data.id, function (err, todo) {
       todo.title = data.title;
       todo.save(function (err) {
         if (err) throw err;
-        socket.emit('edited', todo);
-        socket.broadcast.emit('edited', todo);
+        socket.emit(SocketEvents.EDITED, todo);
+        socket.broadcast.emit(SocketEvents.EDITED, todo);
       });
     });
   });
@@ -150,17 +146,13 @@ sio.sockets.on('connection', function (socket: AppServerSocket) {
     function: change the status of a todo
     response: the todo that was edited, json object
   */
-  socket.on(SocketEvents.changestatus, function (data: Models.ChangeTodoStatusCommand) {
-    if (typeof data.id === 'undefined') {
-      return;
-    }
-
+  socket.on(SocketEvents.CHANGESTATUS, function (data: Models.ChangeTodoStatusCommand) {
     Todo.findById(data.id, function (err, todo) {
       todo.complete = data.status == Models.TodoStatusComplete ? true : false;
       todo.save(function (err) {
         if (err) throw err;
-        socket.emit(SocketEvents.statuschanged, data);
-        socket.broadcast.emit(SocketEvents.statuschanged, data);
+        socket.emit(SocketEvents.STATUSCHANGED, data);
+        socket.broadcast.emit(SocketEvents.STATUSCHANGED, data);
       });
     });
   });
@@ -170,22 +162,22 @@ sio.sockets.on('connection', function (socket: AppServerSocket) {
     function: change the status of all todos
     response: the status, json object
   */
-  socket.on(SocketEvents.allchangestatus, function (data: Models.ChangeTodoStatusCommand) {
+  socket.on(SocketEvents.ALLCHANGESTATUS, function (data: Models.ChangeTodoStatusCommand) {
     var master_status = data.status == Models.TodoStatusComplete ? true : false;
     Todo.find({}, function (err, todos) {
       for (var todo of todos) {
         todo.complete = master_status;
         todo.save(function (err) {
           if (err) throw err;
-          socket.emit(SocketEvents.allstatuschanged, data);
-          socket.broadcast.emit(SocketEvents.allstatuschanged, data);
+          socket.emit(SocketEvents.ALLSTATUSCHANGED, data);
+          socket.broadcast.emit(SocketEvents.ALLSTATUSCHANGED, data);
         });
       }
     });
   });
 
   //disconnect state
-  socket.on(SocketEvents.disconnect, function () {
+  socket.on(SocketEvents.DISCONNECT, function () {
     var socketid = address_list[address].list;
 
     socketid.splice(socketid.indexOf(socket.id), 1);
@@ -195,8 +187,8 @@ sio.sockets.on('connection', function (socket: AppServerSocket) {
     }
 
     users = Object.keys(address_list).length;
-    socket.emit(SocketEvents.count, { count: users });
-    socket.broadcast.emit(SocketEvents.count, { count: users });
+    socket.emit(SocketEvents.COUNT, { count: users });
+    socket.broadcast.emit(SocketEvents.COUNT, { count: users });
   });
 
 });

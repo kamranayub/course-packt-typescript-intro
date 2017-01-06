@@ -1,15 +1,13 @@
-export const SocketEvents = {
-    count: 'count',
-    all: 'all',
-    add: 'add',
-    added: 'added',
-    edit: 'edit',
-    edited: 'edited',
-    delete: 'delete',
-    deleted: 'deleted',
-    changestatus: 'changestatus',
-    statuschanged: 'statuschanged',    
-    allchangestatus: 'allchangestatus',
-    allstatuschanged: 'allstatuschanged',
-    disconnect: 'disconnect'
-}
+export const COUNT = 'count';
+export const ALL = 'all';
+export const ADD = 'add';
+export const ADDED = 'added';
+export const EDIT = 'edit';
+export const EDITED = 'edited';
+export const DELETE = 'delete';
+export const DELETED = 'deleted';
+export const CHANGESTATUS = 'changestatus';
+export const STATUSCHANGED = 'statuschanged';  
+export const ALLCHANGESTATUS = 'allchangestatus';
+export const ALLSTATUSCHANGED = 'allstatuschanged';
+export const DISCONNECT = 'disconnect';
