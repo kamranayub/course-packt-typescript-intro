@@ -1,28 +1,32 @@
 /**
  * Todo model
  */
-interface Todo {
-    id: string;
+export interface Todo {
+    _id?: string;
+    id?: string;
     title: string;
-    complete: boolean;
+    complete?: boolean;
 }
 
 /**
  * Delete todo command
  */
-interface DeleteTodoCommand {
+export interface DeleteTodoCommand {
     id: string;
 }
+
+export const TodoStatusComplete = 'complete';
+export const TodoStatusIncomplete = 'incomplete';
 
 /**
  * Available todo statuses that can be set
  */
-type TodoStatus = 'complete'|'incomplete';
+export type TodoStatus = typeof TodoStatusComplete | typeof TodoStatusIncomplete;
 
 /**
  * Change todo status command
  */
-interface ChangeTodoStatusCommand {
+export interface ChangeTodoStatusCommand {
     id?: string;
     status: TodoStatus;
 }

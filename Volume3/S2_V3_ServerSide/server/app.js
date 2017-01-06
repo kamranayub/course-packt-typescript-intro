@@ -12,7 +12,9 @@ const errorhandler = require("errorhandler");
 const mongoose = require("mongoose");
 const io = require("socket.io");
 const routes = require("./routes/index");
-const todos = require("./models/todos");
+const todos = require("./todos");
+const events_1 = require("../common/events");
+const Models = require("../common/models");
 var mongoURI = 'mongodb://localhost/todos', Schema = mongoose.Schema, ObjectID = Schema.Types.ObjectId, Todo = todos.init(Schema, mongoose);
 var connectWithRetry = function () {
     return mongoose.connect(mongoURI, function (err) {
@@ -34,7 +36,7 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(methodOverride());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, '..', 'public')));
 if (app.get('env') === 'development') {
     app.use(errorhandler());
 }
@@ -58,22 +60,22 @@ sio.sockets.on('connection', function (socket) {
         address_list[address] = { list: socketid };
     }
     users = Object.keys(address_list).length;
-    socket.emit('count', { count: users });
-    socket.broadcast.emit('count', { count: users });
+    socket.emit(events_1.SocketEvents.count, { count: users });
+    socket.broadcast.emit(events_1.SocketEvents.count, { count: users });
     /*
       handles 'all' namespace
       function: list all todos
       response: all todos, json format
     */
     Todo.find({}, function (err, todos) {
-        socket.emit('all', todos);
+        socket.emit(events_1.SocketEvents.all, todos);
     });
     /*
       handles 'add' namespace
       function: add a todo
       Response: Todo object
     */
-    socket.on('add', function (data) {
+    socket.on(events_1.SocketEvents.add, function (data) {
         var todo = new Todo({
             title: data.title,
             complete: false
@@ -90,7 +92,7 @@ sio.sockets.on('connection', function (socket) {
       function: delete a todo
       response: the delete todo id, json object
     */
-    socket.on('delete', function (data) {
+    socket.on(events_1.SocketEvents.delete, function (data) {
         Todo.findById(data.id, function (err, todo) {
             todo.remove(function (err) {
                 if (err)
@@ -105,7 +107,10 @@ sio.sockets.on('connection', function (socket) {
       function: edit a todo
       response: edited todo, json object
     */
-    socket.on('edit', function (data) {
+    socket.on(events_1.SocketEvents.edit, function (data) {
+        if (typeof data.id === 'undefined') {
+            return;
+        }
         Todo.findById(data.id, function (err, todo) {
             todo.title = data.title;
             todo.save(function (err) {
@@ -121,14 +126,17 @@ sio.sockets.on('connection', function (socket) {
       function: change the status of a todo
       response: the todo that was edited, json object
     */
-    socket.on('changestatus', function (data) {
+    socket.on(events_1.SocketEvents.changestatus, function (data) {
+        if (typeof data.id === 'undefined') {
+            return;
+        }
         Todo.findById(data.id, function (err, todo) {
-            todo.complete = data.status == 'complete' ? true : false;
+            todo.complete = data.status == Models.TodoStatusComplete ? true : false;
             todo.save(function (err) {
                 if (err)
                     throw err;
-                socket.emit('statuschanged', data);
-                socket.broadcast.emit('statuschanged', data);
+                socket.emit(events_1.SocketEvents.statuschanged, data);
+                socket.broadcast.emit(events_1.SocketEvents.statuschanged, data);
             });
         });
     });
@@ -137,30 +145,30 @@ sio.sockets.on('connection', function (socket) {
       function: change the status of all todos
       response: the status, json object
     */
-    socket.on('allchangestatus', function (data) {
-        var master_status = data.status == 'complete' ? true : false;
+    socket.on(events_1.SocketEvents.allchangestatus, function (data) {
+        var master_status = data.status == Models.TodoStatusComplete ? true : false;
         Todo.find({}, function (err, todos) {
             for (var todo of todos) {
                 todo.complete = master_status;
                 todo.save(function (err) {
                     if (err)
                         throw err;
-                    socket.emit('allstatuschanged', data);
-                    socket.broadcast.emit('allstatuschanged', data);
+                    socket.emit(events_1.SocketEvents.allstatuschanged, data);
+                    socket.broadcast.emit(events_1.SocketEvents.allstatuschanged, data);
                 });
             }
         });
     });
     //disconnect state
-    socket.on('disconnect', function () {
+    socket.on(events_1.SocketEvents.disconnect, function () {
         var socketid = address_list[address].list;
         socketid.splice(socketid.indexOf(socket.id), 1);
         if (Object.keys(socketid).length == 0) {
             delete address_list[address];
         }
         users = Object.keys(address_list).length;
-        socket.emit('count', { count: users });
-        socket.broadcast.emit('count', { count: users });
+        socket.emit(events_1.SocketEvents.count, { count: users });
+        socket.broadcast.emit(events_1.SocketEvents.count, { count: users });
     });
 });
 app.use('/', routes);
