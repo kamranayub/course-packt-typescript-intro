@@ -25,6 +25,7 @@
     "@types/method-override": "0.0.29",
     "@types/mongoose": "^4.7.2",
     "@types/morgan": "^1.7.32",
-    "@types/socket.io": "^1.4.27"
+    "@types/socket.io": "^1.4.27",
+    "typescript": "^2.1.4"
   }
 }
