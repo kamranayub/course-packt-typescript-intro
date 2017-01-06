@@ -1,7 +1,7 @@
 /**
  * Todo model
  */
-interface Todo {
+export interface Todo {
     _id?: string;
     id?: string;
     title: string;
@@ -11,22 +11,22 @@ interface Todo {
 /**
  * Delete todo command
  */
-interface DeleteTodoCommand {
+export interface DeleteTodoCommand {
     id: string;
 }
 
-const TodoStatusComplete = 'complete';
-const TodoStatusIncomplete = 'incomplete';
+export const TodoStatusComplete = 'complete';
+export const TodoStatusIncomplete = 'incomplete';
 
 /**
  * Available todo statuses that can be set
  */
-type TodoStatus = typeof TodoStatusComplete | typeof TodoStatusIncomplete;
+export type TodoStatus = typeof TodoStatusComplete | typeof TodoStatusIncomplete;
 
 /**
  * Change todo status command
  */
-interface ChangeTodoStatusCommand {
+export interface ChangeTodoStatusCommand {
     id?: string;
     status: TodoStatus;
 }

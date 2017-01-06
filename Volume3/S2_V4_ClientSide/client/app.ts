@@ -1,5 +1,6 @@
-/// <reference path="../../common/models.ts" />
-/// <reference path="sockets.ts" />
+import { SocketEvents } from '../common/events';
+import { AppClientSocket } from './sockets'
+import * as Models from '../common/models'
 
 jQuery(function ($: JQueryStatic) {
 	"use strict";
@@ -14,12 +15,12 @@ jQuery(function ($: JQueryStatic) {
 			this.socketActions();
 		},
 
-		persist: function (new_todo: Todo) {
+		persist: function (new_todo: Models.Todo) {
 
 			socket.emit('add', new_todo);
 		},
 
-		edit: function (edit_todo: Todo) {
+		edit: function (edit_todo: Models.Todo) {
 
 			socket.emit('edit', edit_todo);
 		},
@@ -29,12 +30,12 @@ jQuery(function ($: JQueryStatic) {
 			socket.emit('delete', { id: todo_id });
 		},
 
-		changeStatus: function (todo_id: string, todo_status: TodoStatus) {
+		changeStatus: function (todo_id: string, todo_status: Models.TodoStatus) {
 
 			socket.emit('changestatus', { id: todo_id, status: todo_status });
 		},
 
-		allChangeStatus: function (master_status: TodoStatus) {
+		allChangeStatus: function (master_status: Models.TodoStatus) {
 
 			socket.emit('allchangestatus', { status: master_status });
 		},
@@ -44,7 +45,7 @@ jQuery(function ($: JQueryStatic) {
 				if (!$('#new-todo').val()) {
 					return false;
 				}
-				var new_todo: Todo = {
+				var new_todo: Models.Todo = {
 					title: $('#new-todo').val(),
 					complete: false
 				}
@@ -87,7 +88,7 @@ jQuery(function ($: JQueryStatic) {
 					app.destroy($(this).attr('data-todoId'));
 				} else {
 					$('li#' + $(this).attr('data-todoId') + ' .view label').html($(this).val());
-					var edit_todo: Todo = {
+					var edit_todo: Models.Todo = {
 						title: $(this).val(),
 						id: $(this).attr('data-todoId')
 					}
@@ -124,32 +125,32 @@ jQuery(function ($: JQueryStatic) {
 				$('footer#footer').html(data.count + ' users online.');
 			});
 
-			socket.on(SocketEvents.added, function (data: Todo) {
+			socket.on(SocketEvents.added, function (data: Models.Todo) {
 				app.addToList(data);
 			});
 
-			socket.on(SocketEvents.deleted, function (data: DeleteTodoCommand) {
+			socket.on(SocketEvents.deleted, function (data: Models.DeleteTodoCommand) {
 				app.destroyOnTodoList(data.id);
 			});
 
-			socket.on(SocketEvents.statuschanged, function (data: ChangeTodoStatusCommand) {
+			socket.on(SocketEvents.statuschanged, function (data: Models.ChangeTodoStatusCommand) {
 				if (typeof data.id !== 'undefined') {
 					app.markOnTodoList(data.id, data.status);
 				}
 			});
 
-			socket.on(SocketEvents.edited, function (data: Todo) {
+			socket.on(SocketEvents.edited, function (data: Models.Todo) {
 				$('li#' + data._id + ' .view label').html(data.title);
 				$('li#' + data._id + ' input.edit').val(data.title);
 			});
 
-			socket.on(SocketEvents.allstatuschanged, function (data: ChangeTodoStatusCommand) {
+			socket.on(SocketEvents.allstatuschanged, function (data: Models.ChangeTodoStatusCommand) {
 				app.markAllOnTodoList(data.status);
 			});
 		},
 
 		list: function () {
-			socket.on(SocketEvents.all, function (data: Todo[]) {
+			socket.on(SocketEvents.all, function (data: Models.Todo[]) {
 				$('#todo-list').html('');
 				for (var i = 0; i < data.length; i++) {
 					if (data[i].complete) {
@@ -162,7 +163,7 @@ jQuery(function ($: JQueryStatic) {
 			});
 
 		},
-		addToList: function (new_todo: Todo) {
+		addToList: function (new_todo: Models.Todo) {
 			$('#todo-list').append('<li id="' + new_todo._id + '"><div class="view"><input data-todoId="' + new_todo._id + '" class="toggle" type="checkbox"><label>' + new_todo.title + '</label><button data-todoId="' + new_todo._id + '" class="destroy"></button></div><input data-todoId="' + new_todo._id + '" class="edit" value="' + new_todo.title + '"></li>');
 			app.mainSectionToggle();
 		},
@@ -171,7 +172,7 @@ jQuery(function ($: JQueryStatic) {
 			app.mainSectionToggle();
 		},
 
-		markOnTodoList: function (todo_id: string, todo_status: TodoStatus) {
+		markOnTodoList: function (todo_id: string, todo_status: Models.TodoStatus) {
 			if (todo_status == 'complete') {
 				$('li#' + todo_id).addClass('completed');
 				$('li#' + todo_id + ' div.view input.toggle').prop('checked', true);
@@ -185,7 +186,7 @@ jQuery(function ($: JQueryStatic) {
 			}
 		},
 
-		markAllOnTodoList: function (master_status: TodoStatus) {
+		markAllOnTodoList: function (master_status: Models.TodoStatus) {
 			if (master_status == 'complete') {
 				$('ul#todo-list li').addClass('completed');
 				$('input.toggle').prop('checked', true);

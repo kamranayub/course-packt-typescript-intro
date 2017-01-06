@@ -1,4 +1,4 @@
-const SocketEvents = {
+export const SocketEvents = {
     count: 'count',
     all: 'all',
     add: 'add',

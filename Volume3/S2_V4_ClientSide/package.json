@@ -4,9 +4,9 @@
   "private": true,
   "scripts": {
     "start": "node app",
-    "build_server": "node_modules/.bin/tsc -p .",
-    "build_client": "node_modules/.bin/tsc -p public/javascripts",
-    "build": "npm run build_server && npm run build_client"
+    "tsc": "node_modules/.bin/tsc -p .",
+    "browserify": "node_modules/.bin/browserify client/app.js --o public/javascripts/app.js",    
+    "build": "npm run tsc && npm run browserify"
   },
   "dependencies": {
     "body-parser": "~1.15.1",
@@ -28,6 +28,7 @@
     "@types/mongoose": "^4.7.2",
     "@types/morgan": "^1.7.32",
     "@types/socket.io": "^1.4.27",
-    "@types/socket.io-client": "^1.4.29"
+    "@types/socket.io-client": "^1.4.29",
+    "browserify": "^13.3.0"
   }
 }
