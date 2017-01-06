@@ -11,7 +11,7 @@ var express = require('express')
   , errorhandler = require('errorhandler')
   , mongoose = require('mongoose')
   , io = require('socket.io')
-  , routes = require('./routes')
+  , routes = require('./routes/index')
     
   , mongoURI =  'mongodb://localhost/todos'
   , Schema = mongoose.Schema
@@ -59,21 +59,20 @@ var sio = io.listen(server);
 //User online user count variable
 var users = 0;
 
-var address_list = new Array();
+var address_list = {};
 
 sio.sockets.on('connection', function (socket) {
   var address = socket.handshake.address;
-
-  if (address_list[address]) {
-    var socketid = address_list[address].list;
-    socketid.push(socket.id);
-    address_list[address].list = socketid;
-  } else {
-    var socketid = new Array();
-    socketid.push(socket.id);
-    address_list[address] = new Array();
-    address_list[address].list = socketid;
-  }
+    var socketid;
+    if (address_list[address]) {
+        socketid = address_list[address].list;
+        socketid.push(socket.id);
+        address_list[address].list = socketid;
+    }
+    else {
+        socketid = [socket.id];
+        address_list[address] = { list: socketid };
+    }
 
   users = Object.keys(address_list).length;
 
@@ -176,7 +175,7 @@ sio.sockets.on('connection', function (socket) {
   //disconnect state
   socket.on('disconnect', function() {
     var socketid = address_list[address].list;
-    delete socketid[socketid.indexOf(socket.id)];
+    socketid.splice(socketid.indexOf(socket.id), 1);
     if(Object.keys(socketid).length == 0) {
       delete address_list[address];
     }
@@ -188,4 +187,4 @@ sio.sockets.on('connection', function (socket) {
 });
 
 //Our index page
-app.use('/', routes.index);
+app.use('/', routes);
