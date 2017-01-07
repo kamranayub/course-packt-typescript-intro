@@ -1,5 +1,5 @@
-import { SocketEvents } from '../common/events';
 import { AppClientSocket } from './sockets'
+import * as SocketEvents from '../common/events';
 import * as Models from '../common/models'
 
 jQuery(function ($: JQueryStatic) {
@@ -17,27 +17,27 @@ jQuery(function ($: JQueryStatic) {
 
 		persist: function (new_todo: Models.Todo) {
 
-			socket.emit('add', new_todo);
+			socket.emit(SocketEvents.ADD, new_todo);
 		},
 
 		edit: function (edit_todo: Models.Todo) {
 
-			socket.emit('edit', edit_todo);
+			socket.emit(SocketEvents.EDIT, edit_todo);
 		},
 
 		destroy: function (todo_id: string) {
 
-			socket.emit('delete', { id: todo_id });
+			socket.emit(SocketEvents.DELETE, { id: todo_id });
 		},
 
 		changeStatus: function (todo_id: string, todo_status: Models.TodoStatus) {
 
-			socket.emit('changestatus', { id: todo_id, status: todo_status });
+			socket.emit(SocketEvents.CHANGESTATUS, { id: todo_id, status: todo_status });
 		},
 
 		allChangeStatus: function (master_status: Models.TodoStatus) {
 
-			socket.emit('allchangestatus', { status: master_status });
+			socket.emit(SocketEvents.ALLCHANGESTATUS, { status: master_status });
 		},
 
 		actions: function () {
@@ -121,36 +121,36 @@ jQuery(function ($: JQueryStatic) {
 		},
 
 		socketActions: function () {
-			socket.on(SocketEvents.count, function (data: { count: number }) {
+			socket.on(SocketEvents.COUNT, function (data: { count: number }) {
 				$('footer#footer').html(data.count + ' users online.');
 			});
 
-			socket.on(SocketEvents.added, function (data: Models.Todo) {
+			socket.on(SocketEvents.ADDED, function (data: Models.Todo) {
 				app.addToList(data);
 			});
 
-			socket.on(SocketEvents.deleted, function (data: Models.DeleteTodoCommand) {
+			socket.on(SocketEvents.DELETED, function (data: Models.DeleteTodoCommand) {
 				app.destroyOnTodoList(data.id);
 			});
 
-			socket.on(SocketEvents.statuschanged, function (data: Models.ChangeTodoStatusCommand) {
+			socket.on(SocketEvents.STATUSCHANGED, function (data: Models.ChangeTodoStatusCommand) {
 				if (typeof data.id !== 'undefined') {
 					app.markOnTodoList(data.id, data.status);
 				}
 			});
 
-			socket.on(SocketEvents.edited, function (data: Models.Todo) {
+			socket.on(SocketEvents.EDITED, function (data: Models.Todo) {
 				$('li#' + data._id + ' .view label').html(data.title);
 				$('li#' + data._id + ' input.edit').val(data.title);
 			});
 
-			socket.on(SocketEvents.allstatuschanged, function (data: Models.ChangeTodoStatusCommand) {
+			socket.on(SocketEvents.ALLSTATUSCHANGED, function (data: Models.ChangeTodoStatusCommand) {
 				app.markAllOnTodoList(data.status);
 			});
 		},
 
 		list: function () {
-			socket.on(SocketEvents.all, function (data: Models.Todo[]) {
+			socket.on(SocketEvents.ALL, function (data: Models.Todo[]) {
 				$('#todo-list').html('');
 				for (var i = 0; i < data.length; i++) {
 					if (data[i].complete) {
