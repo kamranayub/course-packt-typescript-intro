@@ -1,16 +1,20 @@
 
 interface QuerystringStatic {
-    encode(qa: { [key: string]: string }, sep?: string, eq?: string): string;
-    encode(qa: string | number | boolean, sep: string | null, eq: string | null, name: string): string;
-    stringify(qa: { [key: string]: string }, sep?: string, eq?: string): string;
-    stringify(qa: string | number | boolean, sep: string | null, eq: string | null, name: string): string;
+    decode(qs: string, sep: string, eq: string, options: DecodeOptions): QuerystringMap;
+    parse(qs: string, sep: string, eq: string, options: DecodeOptions): QuerystringMap;
 
-    decode(qs: string, sep?: string, eq?: string, options?: DecodeOptions): { [key: string]: string };
-    parse(qs: string, sep?: string, eq?: string, options?: DecodeOptions): { [key: string]: string };
+    encode(obj: QuerystringMap, sep: string, eq: string): string;
+    stringify(obj: QuerystringMap, sep: string, eq: string): string;
+    encode(obj: string | boolean | number | null, sep: string, eq: string, name: string | boolean | number): string;
+    stringify(obj: string | boolean | number | null, sep: string, eq: string, name: string | boolean | number): string;
 }
 
 interface DecodeOptions {
     maxKeys: number;
+}
+
+interface QuerystringMap {
+    [key: string]: string | string[];
 }
 
 declare module 'querystring' {
