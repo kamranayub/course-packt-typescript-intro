@@ -92,10 +92,7 @@ var protocolPattern = /^([a-z0-9.+-]+:)/i,
 
 function urlParse(url: string | Url, parseQueryString?: boolean, slashesDenoteHost?: boolean) {
   if (url && util.isObject(url) && url instanceof Url) return url;
-  if (typeof url !== 'string') {
-    throw new TypeError("Parameter 'url' must be a string, not " + typeof url);
-  }
-
+  
   var u = new Url;
   u.parse(url, parseQueryString, slashesDenoteHost);
   return u;
@@ -107,7 +104,7 @@ function urlFormat(obj: string | Url) {
   // If it's an obj, this is a no-op.
   // this way, you can call url_format() on strings
   // to clean up potentially wonky urls.
-  if (typeof obj === 'string') obj = urlParse(obj);
+  if (util.isString(obj)) obj = urlParse(obj);
   if (!(obj instanceof Url)) return Url.prototype.format.call(obj);
   return obj.format();
 }
@@ -424,8 +421,7 @@ class Url {
       }
     }
 
-    if (this.query &&
-        typeof this.query === 'object' &&
+    if (this.query && util.isObject<{[key: string]: string}>(this.query) &&
         Object.keys(this.query).length) {
       query = querystring.stringify(this.query);
     }
@@ -460,7 +456,7 @@ class Url {
   }
 
   resolveObject(relative: string | Url) {
-    if (typeof relative === 'string') {
+    if (util.isString(relative)) {
       var rel = new Url();
       rel.parse(relative, false, true);
       relative = rel;
