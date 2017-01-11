@@ -127,7 +127,7 @@ class Url {
   public hostname: string | null = null;
   public hash: string | null = null;
   public search: string | null = null;
-  public query: string | {[key: string]: string} | null = null;
+  public query: string | QuerystringMap | null = null;
   public pathname: string | null = null;
   public path: string | null = null;
   public href: string | null = null;   
