@@ -52,5 +52,6 @@ interface PunycodeUCS2Static {
 }
 
 declare module 'punycode' {
-    export = PunycodeStatic
+    var punycode: PunycodeStatic;
+    export = punycode;
 }

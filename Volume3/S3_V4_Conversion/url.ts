@@ -21,6 +21,11 @@
 
 'use strict';
 
+/**
+ * Deprecated escape() global function
+ */
+declare function escape(str: string): string;
+
 import punycode = require('punycode');
 import util = require('./util');
 import querystring = require('querystring');
@@ -197,7 +202,7 @@ class Url {
       }
     }
 
-    if (proto && !hostlessProtocol[proto] &&
+    if ((!proto || !hostlessProtocol[proto]) &&
         (slashes || (proto && !slashedProtocol[proto]))) {
 
       // there's a hostname.
