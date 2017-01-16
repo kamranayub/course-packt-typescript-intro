@@ -24,11 +24,11 @@
 /**
  * Deprecated escape() global function
  */
-declare function escape(str: string): string;
+declare function escape(value: string): string;
 
 import punycode = require('punycode');
 import util = require('./util');
-import querystring = require('querystring');
+import querystring = require('querystring')
 
 export = {
   parse: urlParse,
@@ -37,6 +37,7 @@ export = {
   format: urlFormat,
   Url: Url
 }
+
 
 // Reference: RFC 3986, RFC 1808, RFC 2396
 
@@ -67,17 +68,17 @@ var protocolPattern = /^([a-z0-9.+-]+:)/i,
     hostnamePartPattern = /^[+a-z0-9A-Z_-]{0,63}$/,
     hostnamePartStart = /^([+a-z0-9A-Z_-]{0,63})(.*)$/,
     // protocols that can allow "unsafe" and "unwise" chars.
-    unsafeProtocol: {[key: string]: boolean} = {
+    unsafeProtocol = {
       'javascript': true,
       'javascript:': true
     },
     // protocols that never have a hostname.
-    hostlessProtocol: {[key: string]: boolean} = {
+    hostlessProtocol = {
       'javascript': true,
       'javascript:': true
     },
     // protocols that always contain a // bit.
-    slashedProtocol: {[key: string]: boolean} = {
+    slashedProtocol = {
       'http': true,
       'https': true,
       'ftp': true,
@@ -90,16 +91,16 @@ var protocolPattern = /^([a-z0-9.+-]+:)/i,
       'file:': true
     };
 
-function urlParse(url: string | Url, parseQueryString?: boolean, slashesDenoteHost?: boolean) {
+function urlParse(url: Url | string, parseQueryString?: boolean, slashesDenoteHost?: boolean) {
   if (url && util.isObject(url) && url instanceof Url) return url;
-  
+
   var u = new Url;
   u.parse(url, parseQueryString, slashesDenoteHost);
   return u;
 }
 
 // format a parsed object into a url string
-function urlFormat(obj: string | Url) {
+function urlFormat(obj: Url | string) {
   // ensure it's an object, and not a string url.
   // If it's an obj, this is a no-op.
   // this way, you can call url_format() on strings
@@ -109,30 +110,30 @@ function urlFormat(obj: string | Url) {
   return obj.format();
 }
 
-function urlResolve(source: string | Url, relative: Url) {
-  return urlParse(source, false, true).resolve(relative);
-}
-
-function urlResolveObject(source: string | Url, relative: Url) {
+function urlResolveObject(source: string | Url, relative: string | Url) {
   if (!source) return relative;
   return urlParse(source, false, true).resolveObject(relative);
 }
 
-class Url {
-  public protocol: string | null = null;
-  public slashes: boolean | null = null;
-  public auth: string | null = null;
-  public host: string | null = null;
-  public port: string | null = null;
-  public hostname: string | null = null;
-  public hash: string | null = null;
-  public search: string | null = null;
-  public query: string | QuerystringMap | null = null;
-  public pathname: string | null = null;
-  public path: string | null = null;
-  public href: string | null = null;   
+function urlResolve(source: string | Url, relative: string | Url) {
+  return urlParse(source, false, true).resolve(relative);
+}
 
-  parse(url: string, parseQueryString: boolean = false, slashesDenoteHost: boolean = false) {
+class Url {
+  protocol: string | null = null;
+  slashes: boolean | null = null;
+  auth: string | null = null;
+  host: string | null = null;
+  port: string | null = null;
+  hostname: string | null = null;
+  hash: string | null = null;
+  search: string | null = null;
+  query: string | QuerystringMap | null = null;
+  pathname: string | null = null;
+  path: string | null = null;
+  href: string | null = null;
+  
+  parse(url: string, parseQueryString?: boolean, slashesDenoteHost?: boolean) {
     if (!util.isString(url)) {
       throw new TypeError("Parameter 'url' must be a string, not " + typeof url);
     }
@@ -176,11 +177,10 @@ class Url {
       }
     }
 
-    var proto: string | null = null;
-    var protoMatch = protocolPattern.exec(rest);
+    var proto: string | RegExpExecArray | null = protocolPattern.exec(rest);
     var lowerProto = '';
-    if (protoMatch) {
-      proto = protoMatch[0];
+    if (proto) {
+      proto = proto[0];
       lowerProto = proto.toLowerCase();
       this.protocol = lowerProto;
       rest = rest.substr(proto.length);
@@ -190,17 +190,17 @@ class Url {
     // user@server is *always* interpreted as a hostname, and url
     // resolution will treat //foo/bar as host=foo,path=bar because that's
     // how the browser resolves relative URLs.
-    var slashes = false;
+    var slashes;
     if (slashesDenoteHost || proto || rest.match(/^\/\/[^@\/]+@[^@\/]+/)) {
       slashes = rest.substr(0, 2) === '//';
-      if (slashes && !(proto && hostlessProtocol[proto])) {
+      if (slashes && !(proto in hostlessProtocol)) {
         rest = rest.substr(2);
         this.slashes = true;
       }
     }
 
-    if ((!proto || !hostlessProtocol[proto]) &&
-        (slashes || (proto && !slashedProtocol[proto]))) {
+    if (!(proto in hostlessProtocol) &&
+      (slashes || !(proto in slashedProtocol))) {
 
       // there's a hostname.
       // the first instance of /, ?, ;, or # ends the host.
@@ -340,7 +340,7 @@ class Url {
 
     // now rest is set to the post-host stuff.
     // chop off any delim chars.
-    if (!unsafeProtocol[lowerProto]) {
+    if (!(lowerProto in unsafeProtocol)) {
 
       // First, make 100% sure that any "autoEscape" chars get
       // escaped, even if encodeURIComponent doesn't think they
@@ -379,7 +379,7 @@ class Url {
       this.query = {};
     }
     if (rest) this.pathname = rest;
-    if (slashedProtocol[lowerProto] &&
+    if ((lowerProto in slashedProtocol) &&
         this.hostname && !this.pathname) {
       this.pathname = '/';
     }
@@ -394,7 +394,7 @@ class Url {
     // finally, reconstruct the href based on what has been validated.
     this.href = this.format();
     return this;
-  }
+  };
 
   format() {
     var auth = this.auth || '';
@@ -421,7 +421,8 @@ class Url {
       }
     }
 
-    if (this.query && util.isObject<{[key: string]: string}>(this.query) &&
+    if (this.query &&
+        util.isObject<QuerystringMap>(this.query) &&
         Object.keys(this.query).length) {
       query = querystring.stringify(this.query);
     }
@@ -433,7 +434,7 @@ class Url {
     // only the slashedProtocols get the //.  Not mailto:, xmpp:, etc.
     // unless they had them to begin with.
     if (this.slashes ||
-        (!protocol || slashedProtocol[protocol]) && host !== false) {
+        (!protocol || (protocol in slashedProtocol)) && host !== false) {
       host = '//' + (host || '');
       if (pathname && pathname.charAt(0) !== '/') pathname = '/' + pathname;
     } else if (!host) {
@@ -449,11 +450,11 @@ class Url {
     search = search.replace('#', '%23');
 
     return protocol + host + pathname + search + hash;
-  }
+  };
 
-  resolve(relative: Url) {
+  resolve(relative: string | Url) {
     return this.resolveObject(urlParse(relative, false, true)).format();
-  }
+  };
 
   resolveObject(relative: string | Url) {
     if (util.isString(relative)) {
@@ -463,9 +464,9 @@ class Url {
     }
 
     var result = new Url();
-    var tkeys = Object.keys(this);
+    var tkeys = <Array<keyof Url>>Object.keys(this);
     for (var tk = 0; tk < tkeys.length; tk++) {
-      var tkey = <keyof Url>tkeys[tk];
+      var tkey = tkeys[tk];
       result[tkey] = this[tkey];
     }
 
@@ -482,15 +483,15 @@ class Url {
     // hrefs like //foo/bar always cut to the protocol.
     if (relative.slashes && !relative.protocol) {
       // take everything except the protocol from relative
-      var rkeys = Object.keys(relative);
+      var rkeys = <Array<keyof Url>>Object.keys(relative);
       for (var rk = 0; rk < rkeys.length; rk++) {
-        var rkey = <keyof Url>rkeys[rk];
+        var rkey = rkeys[rk];
         if (rkey !== 'protocol')
           result[rkey] = relative[rkey];
       }
 
       //urlParse appends trailing / to urls like http://www.example.com
-      if (result.protocol && slashedProtocol[result.protocol] &&
+      if (result.protocol in slashedProtocol &&
           result.hostname && !result.pathname) {
         result.path = result.pathname = '/';
       }
@@ -508,10 +509,10 @@ class Url {
       // if it is file:, then the host is dropped,
       // because that's known to be hostless.
       // anything else is assumed to be absolute.
-      if (!slashedProtocol[relative.protocol]) {
-        var keys = Object.keys(relative);
+      if (!(relative.protocol in slashedProtocol)) {
+        var keys = <Array<keyof Url>>Object.keys(relative);
         for (var v = 0; v < keys.length; v++) {
-          var k = <keyof Url>keys[v];
+          var k = keys[v];
           result[k] = relative[k];
         }
         result.href = result.format();
@@ -519,7 +520,7 @@ class Url {
       }
 
       result.protocol = relative.protocol;
-      if (!relative.host && !hostlessProtocol[relative.protocol]) {
+      if (!relative.host && !(relative.protocol in hostlessProtocol)) {
         var relPath = (relative.pathname || '').split('/');
         while (relPath.length && !(relative.host = <string>relPath.shift()));
         if (!relative.host) relative.host = '';
@@ -547,17 +548,17 @@ class Url {
       return result;
     }
 
-    var isSourceAbs = <boolean>(result.pathname && result.pathname.charAt(0) === '/'),
-        isRelAbs = <boolean>(
+    var isSourceAbs = (result.pathname && result.pathname.charAt(0) === '/'),
+        isRelAbs = (
             relative.host ||
             relative.pathname && relative.pathname.charAt(0) === '/'
         ),
-        mustEndAbs = <boolean>(isRelAbs || isSourceAbs ||
+        mustEndAbs = (isRelAbs || isSourceAbs ||
                       (result.host && relative.pathname)),
         removeAllDots = mustEndAbs,
         srcPath = result.pathname && result.pathname.split('/') || [],
         relPath = relative.pathname && relative.pathname.split('/') || [],
-        psychotic = result.protocol && !slashedProtocol[result.protocol];
+        psychotic = result.protocol && !(result.protocol in slashedProtocol);
 
     // if the url is a non-slashed url, then relative
     // links like ../.. should be able
@@ -725,14 +726,14 @@ class Url {
     return result;
   };
 
-  parseHost() {
-    if (this.host === null) return;
-
+  parseHost() {    
     var host = this.host;
-    var port: string;
-    var portMatch = portPattern.exec(host);
-    if (portMatch) {
-      port = portMatch[0];
+    
+    if (util.isNull(host)) return;
+
+    var port: string | RegExpExecArray | null = portPattern.exec(host);
+    if (port) {
+      port = port[0];
       if (port !== ':') {
         this.port = port.substr(1);
       }
